@@ -162,7 +162,7 @@ def get_input():
 
 
 
-def draw():
+def drawing():
     global tiles
     global camera
     for tile in tiles:
