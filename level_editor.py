@@ -12,6 +12,7 @@ pygame.init()
 grass = pygame.image.load("Images/Grass.png")
 dirt = pygame.image.load("Images/Dirt.png")
 tile_size = grass.get_height()
+changed = False
 level = []
 current_block = 1
 
@@ -19,7 +20,6 @@ rel = pygame.Vector2()
 
 
 def create_level():
-    print(type(n_height))
     for i in range(n_height):
         level.append([])
         for j in range(n_width):
@@ -84,23 +84,30 @@ def drag(x, y, level_s, dif):
         camera.y = -(y - dif.y)
 
 
+# def zoom(num):
+#     global tile_sizeZ
+#
+#
+#     def lsizeupdate(size):
+#         if level_size[2] != len(level[0] * size):
+#             level_size[2] = len(level[0]) * size
+#             camera.x += (num*len(level[0]))/2
+#         if level_size[3] != len(level) * size:
+#             level_size[3] = len(level) * size
+#             camera.y += (num * len(level))/2
+#     if tile_sizeZ>4 and tile_sizeZ + num!=0 and num<0:
+#         tile_sizeZ = tile_sizeZ + num
+#         lsizeupdate(tile_sizeZ)
+#     elif tile_sizeZ < 128 and tile_sizeZ + num!=0 and num>0:
+#         tile_sizeZ = tile_sizeZ + num
+#         lsizeupdate(tile_sizeZ)
+
+
 def zoom(num):
-    global tile_sizeZ
+    global level_image
+    level_image = pygame.transform.scale(level_image,(level_image.get_height()+num,level_image.get_width()+num))
 
-
-    def lsizeupdate(size):
-        if level_size[2] != len(level[0] * size):
-            level_size[2] = len(level[0]) * size
-            camera.x += (num*len(level[0]))/2
-        if level_size[3] != len(level) * size:
-            level_size[3] = len(level) * size
-            camera.y += (num * len(level))/2
-    if tile_sizeZ>4 and tile_sizeZ + num!=0 and num<0:
-        tile_sizeZ = tile_sizeZ + num
-        lsizeupdate(tile_sizeZ)
-    elif tile_sizeZ < 128 and tile_sizeZ + num!=0 and num>0:
-        tile_sizeZ = tile_sizeZ + num
-        lsizeupdate(tile_sizeZ)
+    #changed=False
 
 
 def get_input():
@@ -146,13 +153,13 @@ def get_input():
     if keys[pygame.K_q]:
         zoom(-1)
 
-        grassre = pygame.transform.scale(grass, (tile_sizeZ, tile_sizeZ))
-        dirtre = pygame.transform.scale(dirt, (tile_sizeZ, tile_sizeZ))
+        #grassre = pygame.transform.scale(grass, (tile_sizeZ, tile_sizeZ))
+        #dirtre = pygame.transform.scale(dirt, (tile_sizeZ, tile_sizeZ))
     if keys[pygame.K_e]:
         zoom(1)
 
-        grassre = pygame.transform.scale(grass, (tile_sizeZ, tile_sizeZ))
-        dirtre = pygame.transform.scale(dirt, (tile_sizeZ, tile_sizeZ))
+        #grassre = pygame.transform.scale(grass, (tile_sizeZ, tile_sizeZ))
+        #dirtre = pygame.transform.scale(dirt, (tile_sizeZ, tile_sizeZ))
     if keys[pygame.K_p]:
         b = bb.Box()
         b.root.protocol("WM_DELETE_WINDOW", b.root.destroy)
@@ -161,26 +168,26 @@ def get_input():
         #pygame.image.save(levelimage,"level.png")
 
 
-
-def drawing():
+def draw():
     global tiles
     global camera
     for tile in tiles:
-        tilex = [(tile[1][0] * tile_sizeZ), (tile[1][1] * tile_sizeZ)]
+        tilex = [tile[1][0]*tile_size, tile[1][1]*tile_size]
         if tile[0] == 'dirt':
-            screen.blit(dirtre, tilex - camera)
+            level_image.blit(dirt, tilex)
+            print(tilex)
 
         if tile[0] == 'grass':
-            screen.blit(grassre, tilex - camera)
-    pygame.display.update()
+            level_image.blit(grass, tilex)
 
 
 def resize_level():
     while level_size[2:3]>list(WINDOW_SIZE):
         zoom(-1)
-        print(tile_sizeZ)
-        grassre = pygame.transform.scale(grass, (tile_sizeZ, tile_sizeZ))
-        dirtre = pygame.transform.scale(dirt, (tile_sizeZ, tile_sizeZ))
+        #print(tile_sizeZ)
+        level_image = pygame.transform.scale(level_image, (len(level[0])),(len(level)))
+        #grassre = pygame.transform.scale(grass, (tile_sizeZ, tile_sizeZ))
+        #dirtre = pygame.transform.scale(dirt, (tile_sizeZ, tile_sizeZ))
 
 
 def tki():
@@ -199,18 +206,25 @@ n_height = settings.n_height
 n_width = settings.n_width
 create_level()
 create_tile()
+level_image = pygame.Surface((len(level[0])*tile_size,len(level)*tile_size))
 print(level_size[2:4])
-resize_level()
+#resize_level()
 camera.x = -(WINDOW_SIZE[0] / 2 - level_size[2] / 2)
 camera.y = -(WINDOW_SIZE[1] / 2 - level_size[3] / 2)
 while run:
     l_size = level_size
-    screen.fill((0, 0, 0))
+    #screen.fill((0, 0, 0))
     levelupdate(l_size)
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
-    draw()
+    if changed == False:
+        draw()
+        changed=True
+    #pygame.image.save(level_image,'smthn.png')
+    screen.blit(level_image,[l_size[0],l_size[1]])
+    pygame.display.update()
+    print(level_image.get_height())
     get_input()
     clock.tick(60)
