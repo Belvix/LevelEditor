@@ -7,6 +7,8 @@ import settings
 
 settings.init()
 
+pygame.init()
+
 grass = pygame.image.load("Images/Grass.png")
 dirt = pygame.image.load("Images/Dirt.png")
 tile_size = grass.get_height()
@@ -23,11 +25,10 @@ def create_level():
         for j in range(n_width):
             level[i].append('0')
 
-
-pygame.init()
-
 WINDOW_SIZE = (1280, 720)
 screen = pygame.display.set_mode(WINDOW_SIZE)
+grass = grass.convert()
+dirt = dirt.convert()
 
 clock = pygame.time.Clock()
 
