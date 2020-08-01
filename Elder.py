@@ -1,4 +1,6 @@
 from tkinter import *
+from tkinter import filedialog
+import json
 import pygame
 import settings
 
@@ -11,6 +13,7 @@ class Elder:
         self.myFrame.pack()
         self.sendButton = Button(self.myFrame, text='send', command=self.sendData)
         self.myButton = Button(self.myFrame, text='close', command=self.end)
+        self.loadButton = Button(self.myFrame, text='load', command=self.load)
         self.widthM = Label(self.myFrame, text="No of tiles W:")
         self.heightM = Label(self.myFrame, text="No of tiles H")
         self.widthM.grid(row=0, column=0)
@@ -21,6 +24,7 @@ class Elder:
         self.hEntry.grid(row=1, column=1)
         self.sendButton.grid(row=2, column=0)
         self.myButton.grid(row=3, column=0)
+        self.loadButton.grid(row=4,column=1)
         self.width = 0
         self.height = 0
         try:
@@ -30,6 +34,12 @@ class Elder:
     def on_closing():
         self.sendData()
         root.destroy()
+
+    def load(self):
+        settings.load = True
+        with open('data.json','r') as file:
+            settings.level = json.loads(file)
+        print(settings.level)
         
     def end(self):
         pygame.quit()
